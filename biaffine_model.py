@@ -61,7 +61,7 @@ def create_data_loader(df, tokenizer, max_len, batch_size):
     return DataLoader(ds, batch_size=batch_size)
 
 
-def create_dataset(train, dev, test, tokenizer=tokenizer):
+def create_dataset(train, dev, test, tokenizer):
     train_data_loader = create_data_loader(train, tokenizer, args.max_len, args.batch_size)
     dev_data_loader = create_data_loader(dev, tokenizer, args.max_len, args.batch_size)
     test_data_loader = create_data_loader(test, tokenizer, args.max_len, args.batch_size)
@@ -224,7 +224,7 @@ def main(args):
     tokenizer = BertTokenizer.from_pretrained(args.tokenizer)
     print("Loading Data")
     train, dev, test, train_head, train_tail, dev_head, dev_tail, test_head, test_tail = read_data(args)
-    train_data_loader, dev_data_loader, test_data_loader = create_dataset(train, dev, test)
+    train_data_loader, dev_data_loader, test_data_loader = create_dataset(train, dev, test, tokenizer)
     
     print("Building Model")
     model = Biaffine(args)
