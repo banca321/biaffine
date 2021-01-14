@@ -16,7 +16,6 @@ else:
     device = torch.device("cpu")
     print('No GPU available, using the CPU instead.')
     
-tokenizer = BertTokenizer.from_pretrained("emilyalsentzer/Bio_ClinicalBERT")
 
 class BertDataset(Dataset):
     def __init__(self, sentences, labels, tokenizer, max_len):
@@ -202,40 +201,6 @@ def eval_model(model, data_loader, head, tail, loss_fn, device, n_examples):
             loss = loss_fn(outputs, labels)
             correct_predictions += torch.sum(preds == labels)
             losses.append(loss.item())
-            
-            
-def get_predictions(model, data_loader, head, tail):
-    model = model.eval()
-    sentences = []
-    predictions = []
-    prediction_probs = []
-    real_values = []
-    
-    with torch.no_grad():
-        for idx, d in enumerate(data_loader):
-            sentence = d["sentence_text"]
-            input_ids = d["input_ids"].to(device)
-            attention_mask = d["attention_mask"].to(device)
-            labels = d["labels"].to(device)
-            
-            idx_h = head[idx*args.batch_size:(idx+1)*args.batch_size]
-            idx_t = tail[idx*args.batch_size:(idx+1)*args.batch_size]
-            
-            outputs = model(
-                input_ids=input_ids,
-                attention_mask=attention_mask,
-                idx_h=idx_h,
-                idx_t=idx_t
-            )
-            _, preds = torch.max(outputs, dim=1)
-            sentences.extend(sentence)
-            predictions.extend(preds)
-            prediction_probs.extend(outputs)
-            real_values.extend(labels)
-    predictions = torch.stack(predictions).cpu()
-    prediction_probs = torch.stack(prediction_probs).cpu()
-    real_values = torch.stack(real_values).cpu()
-    return sentences, predictions, prediction_probs, real_values
 
 
 def parse_arguments(parser):
@@ -250,12 +215,13 @@ def parse_arguments(parser):
     parser.add_argument('--head_sec_dim', type=int, default=180, help='the size of the second hidden layer of head feed forward')   #head second linear
     parser.add_argument('--tail_first_dim', type=int, default=382, help='the size of the first hidden layer of tail feed forward')   #tail first linear
     parser.add_argument('--tail_sec_dim', type=int, default=180, help='the size of the second hidden layer of tail feed forward')   #tail second linear
-    #parser.add_argument()   #optimizer learning rate
+    parser.add_argument('--tokenizer', type=str, default="emilyalsentzer/Bio_ClinicalBERT", help='the pretrained tokenizer that will be used')   #optimizer learning rate
     
     args = parser.parse_arguments(parser)
     return args
 
 def main(args):
+    tokenizer = BertTokenizer.from_pretrained(args.tokenizer)
     print("Loading Data")
     train, dev, test, train_head, train_tail, dev_head, dev_tail, test_head, test_tail = read_data(args)
     train_data_loader, dev_data_loader, test_data_loader = create_dataset(train, dev, test)
@@ -318,32 +284,4 @@ if __name__ == '__main__':
     args = parse_arguments(parser)
     
     main(args)
-    
-    
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
+            
