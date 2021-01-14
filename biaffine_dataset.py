@@ -3,7 +3,6 @@ import argparse
 from transformers import BertTokenizer
 
 
-
 def extract_sen(text, start1, start2):
     link1 = text[0:start1]
     count1 = link1.count('$')
@@ -85,11 +84,15 @@ def main():
     test1['idx_h'] = test1.apply(lambda x: word_idx(x['word1'], x['token']), axis=1)
     test1['idx_t'] = test1.apply(lambda x: word_idx(x['word2'], x['token']), axis=1)
     
-    train = train1[train1.idx_h != -1]
+    train = train1[['link1', 'link2', 'idx_h', 'idx_t', 'extracted', 'label']]
+    dev = dev1[['link1', 'link2', 'idx_h', 'idx_t', 'extracted', 'label']]
+    test = test1[['link1', 'link2', 'idx_h', 'idx_t', 'extracted', 'label']]
+    
+    train = train[train1.idx_h != -1]
     train = train[train.idx_t != -1]
-    dev = dev1[dev1.idx_h != -1]
+    dev = dev[dev1.idx_h != -1]
     dev = dev[dev.idx_t != -1]
-    test = test1[test1.idx_h != -1]
+    test = test[test1.idx_h != -1]
     test = test[test.idx_t != -1]
     train = train.dropna(axis=0)
     dev = dev.dropna(axis=0)
