@@ -68,7 +68,7 @@ def create_dataset(train, dev, test, tokenizer):
     return train_data_loader, dev_data_loader, test_data_loader
 
 
-def read_data():
+def read_data(args):
     train = pd.read_csv(args.train)
     dev = pd.read_csv(args.valid)
     test = pd.read_csv(args.test)
