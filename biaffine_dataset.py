@@ -98,7 +98,7 @@ def extract_sen(text, start1, start2):
         extract = text.split('$')[count1]
     else:
         extract1 = text.split('$')[count1]
-        extract2 = text.splot('$')[count2]
+        extract2 = text.split('$')[count2]
         if count1 < count2:
             extract = extract1 + " " + extract2
         else:
